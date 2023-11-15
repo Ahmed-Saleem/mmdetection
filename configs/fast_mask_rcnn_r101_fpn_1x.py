@@ -42,7 +42,7 @@ model = dict(
         num_convs=4,
         in_channels=256,
         conv_out_channels=256,
-        num_classes=81,
+        num_classes=2,
         loss_mask=dict(
             type='CrossEntropyLoss', use_mask=True, loss_weight=1.0)))
 # model training and testing settings
@@ -70,8 +70,8 @@ test_cfg = dict(
         max_per_img=100,
         mask_thr_binary=0.5))
 # dataset settings
-dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+dataset_type = 'MyDataset'
+data_root = 'mmdet/datasets/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -108,21 +108,21 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train2017.json',
+        ann_file=data_root + 'train.txt',
         proposal_file=data_root + 'proposals/rpn_r50_fpn_1x_train2017.pkl',
-        img_prefix=data_root + 'train2017/',
+        img_prefix=data_root,
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
+        ann_file=data_root + 'val.txt',
         proposal_file=data_root + 'proposals/rpn_r50_fpn_1x_val2017.pkl',
-        img_prefix=data_root + 'val2017/',
+        img_prefix=data_root,
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
+        ann_file=data_root + 'test.txt',
         proposal_file=data_root + 'proposals/rpn_r50_fpn_1x_val2017.pkl',
-        img_prefix=data_root + 'val2017/',
+        img_prefix=data_root,
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -140,11 +140,11 @@ log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 12
+total_epochs = 100
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/fast_mask_rcnn_r101_fpn_1x'
